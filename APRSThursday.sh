@@ -6,7 +6,7 @@
 # =================================================================
 # 1. List of participating callsigns (separate with spaces).
 # You can add or remove callsigns here.
-CALL_SIGNS=("OH6KW" "OH6KW-5" "OH6KW-9" "OH6RAH") 
+CALL_SIGNS=("OH0ABC" "OH0XYZ-5" "OH9PQR" "OH9JKL-9") 
 
 # 2. Custom message content (CQ HOTG will be added automatically).
 # NOTE: The callsign used for sending will be appended automatically.
@@ -95,4 +95,5 @@ done
 ) &
 
 # Main script exits immediately. The background process handles the Unjoin.
+
 exit 0
