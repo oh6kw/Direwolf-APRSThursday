@@ -87,7 +87,7 @@ for SRC in "${CALL_SIGNS[@]}"; do
     SELECTED_MESSAGE=${CUSTOM_MESSAGES[$RANDOM_INDEX]}
     # --------------------------------------
 
-    # APRS message payload: ::ANSRVR   :CQ HOTG Message de OH6KW
+    # APRS message payload: ::ANSRVR   :CQ HOTG Message de CALL
     MESSAGE_PAYLOAD="${ANSRVR_ADDR}:${CQ_PREFIX}${SELECTED_MESSAGE} de $SRC"
 
     echo ""
@@ -141,3 +141,4 @@ done
 
 # Main script exits immediately. The background process handles the Unjoin.
 exit 0
+
