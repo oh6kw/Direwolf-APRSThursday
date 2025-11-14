@@ -1,8 +1,4 @@
-#!/bin/bash
-# APRS CQ HOTG message sending script via Direwolf for multiple callsigns.
-# This script sends APRS messages to the ANSRVR net server via the Dire Wolf KISS TCP port.
-# It handles check-in for multiple callsigns and automatically sends unjoin messages after a delay.
-
+#!/usr/bin/env bash
 # =================================================================
 # USER CONFIGURABLE SETTINGS
 # =================================================================
@@ -10,9 +6,31 @@
 # Add or remove callsigns as needed.
 CALL_SIGNS=("OH6KW" "OH6AH" "OH6RDA")
 
-# 2. Custom message content (CQ HOTG prefix will be added automatically).
-# NOTE: The transmitting callsign will be appended to the message automatically.
-CUSTOM_MESSAGE="Happy APRSThursday from Finland!"
+# 2. Custom messages (CQ HOTG prefix will be added automatically).
+# The script will randomly select one message from this list for each callsign.
+CUSTOM_MESSAGES=(
+    "Happy APRSThursday from Finland!"
+    "Greetings from the land of aurora borealis!"
+    "73 and all the best from the OH-land!"
+    "QSY to the HOTG net freq, listening for traffic!"
+    "Checking in from the shack for some Thursday fun."
+    "Another week, another check-in! 73s to all."
+    "Hope everyone is having a great thursday."
+    "Enjoying the propagation tonight! Good luck to all."
+    "Just testing. Cheers!"
+    "APRS signals are strong tonight. Thanks for digipeating!"
+    "Ready for the weekly APRS net. QSL?"
+    "Sending QSLs digitally via this tiny packet."
+    "Greetings from Finland, where the air is fresh!"
+    "Running my QRP setup today. Low power, high hopes."
+    "Enjoying a hot cup of coffee and the APRS net."
+    "Have a fantastic evening, all net participants!"
+    "This packet is dedicated to the digi-gods. Tnx!"
+    "May your SWR be low and your signals strong."
+    "73 to all the I-gates and digipeaters out there."
+    "APRS is still the coolest tech in ham radio. Prove me wrong!"
+    "Glad to be part of the HOTG community!"
+)
 
 # 3. Delay in seconds between sending messages for consecutive callsigns.
 # Recommended minimum: 30 seconds to prevent overlapping transmissions on the channel.
@@ -55,9 +73,18 @@ fi
 # 1. LOOP: Send Check-in message (CQ HOTG) for each callsign
 # -----------------------------------------------------------------
 for SRC in "${CALL_SIGNS[@]}"; do
+    # --- RANDOM MESSAGE SELECTION LOGIC ---
+    # Calculate the number of messages in the array
+    MESSAGE_COUNT=${#CUSTOM_MESSAGES[@]}
+    # Generate a random index number (0 to MESSAGE_COUNT - 1)
+    RANDOM_INDEX=$(( RANDOM % MESSAGE_COUNT ))
+    # Select the random message
+    SELECTED_MESSAGE=${CUSTOM_MESSAGES[$RANDOM_INDEX]}
+    # --------------------------------------
+
     # APRS Message format: :ADDRESSEE :TEXT
     # The addressee (ANSRVR) must be exactly 9 characters long (padded with spaces).
-    MESSAGE=":ANSRVR   :${CQ_PREFIX}${CUSTOM_MESSAGE} de $SRC"
+    MESSAGE=":ANSRVR   :${CQ_PREFIX}${SELECTED_MESSAGE} de $SRC"
 
     echo ""
     echo "== Sending Check-in for callsign: $SRC =="
@@ -65,7 +92,7 @@ for SRC in "${CALL_SIGNS[@]}"; do
     echo "  Message:        ${MESSAGE}"
 
     # Send the APRS message via kissutil to the Dire Wolf KISS TCP port.
-    # Format: SRC>DEST,PATH:PAYLOAD (PAYLOAD contains the ANSRVR message format)
+    # Format: SRC>DEST,PATH:PAYLOAD
     echo "${SRC}>${DEST},${PATHS}:${MESSAGE}" | "$KISSUTIL" -h "$KISSHOST" -p "$KISSPORT" -v
 
     # Timestamp
