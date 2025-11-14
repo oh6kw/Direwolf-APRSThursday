@@ -6,18 +6,18 @@
 # =================================================================
 # 1. List of participating callsigns (separate with spaces).
 # You can add or remove callsigns here.
-CALL_SIGNS=("OH0ABC" "OH0XYZ-5" "OH9PQR" "OH9JKL-9") 
+CALL_SIGNS=("OH6KW" "OH6AH" "OH6RDA")
 
 # 2. Custom message content (CQ HOTG will be added automatically).
 # NOTE: The callsign used for sending will be appended automatically.
-CUSTOM_MESSAGE="Happy APRSThursday from Finland!" 
+CUSTOM_MESSAGE="Happy APRSThursday from Finland!"
 
 # 3. Delay in seconds between sending messages for consecutive callsigns.
 # Recommendation: at least 30 seconds to prevent overlapping transmissions.
-CALL_DELAY=30 
+CALL_DELAY=30
 
 # 4. Delay (in seconds) before the Unjoin command is sent (300s = 5 min).
-UNJOIN_DELAY=300 
+UNJOIN_DELAY=300
 
 # =================================================================
 # SYSTEM SETTINGS (Do not modify unless you know what you are doing)
@@ -39,28 +39,25 @@ echo "== APRSthursday Net Startup: $("${DATECMD}" '+%Y-%m-%d %H:%M:%S') =="
 
 # Check if kissutil is found
 if [ ! -x "$KISSUTIL" ]; then
-  echo "Error: kissutil command not found. Check installation."
-  exit 1
+    echo "Error: kissutil command not found. Check installation."
+    exit 1
 fi
 
 # -----------------------------------------------------------------
 # 1. LOOP: Send Check-in message (CQ HOTG) for each callsign
 # -----------------------------------------------------------------
 for SRC in "${CALL_SIGNS[@]}"; do
-    # The full message is constructed here: CQ HOTG + custom message + callsign
-    MESSAGE="${CQ_PREFIX}${CUSTOM_MESSAGE} de $SRC"
+    MESSAGE=":ANSRVR   :${CQ_PREFIX}${CUSTOM_MESSAGE} de $SRC"
 
     echo ""
     echo "== Sending Check-in for callsign: $SRC =="
-    echo "  Destination:  $DEST"
-    echo "  Message:      $MESSAGE"
+    echo "  Destination:    $DEST" echo "  Message:        ${MESSAGE}"
 
-    # Send the message to the TCP-KISS port
     echo "${SRC}>${DEST},${PATHS}:${MESSAGE}" | "$KISSUTIL" -h "$KISSHOST" -p "$KISSPORT" -v
 
     # Timestamp
     echo "== Check-in sent at $("${DATECMD}" '+%H:%M:%S') =="
-    
+
     # Wait before the next callsign, UNLESS it's the last callsign
     # Uses Bash specific array slicing to check the last element
     if [[ "$SRC" != "${CALL_SIGNS[@]: -1}" ]]; then
@@ -78,22 +75,22 @@ done
     sleep $UNJOIN_DELAY
 
     echo "== Sending automatic Unjoin message to ANSRVR for ALL callsigns =="
-    
+
     for SRC in "${CALL_SIGNS[@]}"; do
         echo "  >> Sending Unjoin for callsign: $SRC"
-        
-        # Send Unjoin message
-        echo "${SRC}>${DEST},${PATHS}:${UNJOIN_MESSAGE}" | "$KISSUTIL" -h "$KISSHOST" -p "$KISSPORT" -v
-        
+
+        UNJOIN_PAYLOAD=":ANSRVR   :${UNJOIN_MESSAGE}"
+
+        echo "${SRC}>${DEST},${PATHS}:${UNJOIN_PAYLOAD}" | "$KISSUTIL" -h "$KISSHOST" -p "$KISSPORT" -v
+
         # Small delay between unjoins for safety (5s)
-        sleep 5 
+        sleep 5
     done
 
     # Timestamp
     echo "== All Unjoin messages sent at $("${DATECMD}" '+%H:%M:%S') =="
-    
+
 ) &
 
 # Main script exits immediately. The background process handles the Unjoin.
-
 exit 0
