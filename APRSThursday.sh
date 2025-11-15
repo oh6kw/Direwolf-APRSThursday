@@ -9,7 +9,7 @@
 # =================================================================
 
 # 1. List of participating callsigns (space-separated list).
-CALL_SIGNS=("OH6KW" "OH6AH" "OH6RDA")
+CALL_SIGNS=("CA1LL" "CA2LL" "CA3LL-9")
 
 # 2. Custom messages (The 'CQ HOTG ' prefix will be added automatically).
 # The script will randomly select one message from this list for each check-in.
@@ -141,4 +141,5 @@ done
 
 # Main script exits immediately. The background process handles the Unjoin.
 exit 0
+
 
